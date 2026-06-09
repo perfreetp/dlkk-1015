@@ -1,0 +1,395 @@
+@use '@/styles/variables.scss' as *;
+
+.detailPage {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: 180rpx;
+}
+
+.contentSection {
+  background-color: $color-bg-card;
+  margin-bottom: $spacing-md;
+}
+
+.postHeader {
+  padding: $spacing-lg;
+  padding-bottom: $spacing-md;
+}
+
+.authorInfo {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+}
+
+.avatar {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: $radius-round;
+  background-color: $color-bg-hover;
+  flex-shrink: 0;
+}
+
+.authorMeta {
+  flex: 1;
+  margin-left: $spacing-md;
+  min-width: 0;
+}
+
+.authorNameRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  margin-bottom: 4rpx;
+}
+
+.authorName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+  max-width: 260rpx;
+}
+
+.ownerTag {
+  font-size: 20rpx;
+  padding: 2rpx 10rpx;
+  border-radius: $radius-xs;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.buildingInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.followBtn {
+  @include button-reset;
+  min-width: 120rpx;
+  height: 56rpx;
+  padding: 0 $spacing-md;
+  border-radius: $radius-button;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  transition: all $transition-fast;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.followedBtn {
+  background: $color-bg-hover;
+  color: $color-text-secondary;
+}
+
+.categoryTag {
+  display: inline-block;
+  font-size: $font-size-xs;
+  padding: 6rpx 16rpx;
+  border-radius: $radius-sm;
+  font-weight: $font-weight-medium;
+  margin-bottom: $spacing-md;
+}
+
+.postTitle {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  line-height: $line-height-tight;
+  margin-bottom: $spacing-md;
+}
+
+.postContent {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  line-height: $line-height-loose;
+  margin-bottom: $spacing-lg;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.imageList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+}
+
+.postImage {
+  width: 100%;
+  border-radius: $radius-md;
+  background-color: $color-bg-hover;
+  overflow: hidden;
+}
+
+.postMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.metaLeft {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.metaRight {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.metaAction {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.actionSection {
+  display: flex;
+  background-color: $color-bg-card;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1rpx solid $color-divider;
+  gap: $spacing-sm;
+  overflow-x: auto;
+}
+
+.actionBtn {
+  @include button-reset;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm 0;
+  border-radius: $radius-md;
+  transition: all $transition-fast;
+  min-width: 0;
+
+  &:active {
+    background-color: $color-bg-hover;
+  }
+}
+
+.actionIcon {
+  font-size: 36rpx;
+  margin-bottom: 4rpx;
+}
+
+.actionText {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.actionActive .actionText {
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.reportAction .actionText {
+  color: $color-error;
+}
+
+.commentsSection {
+  background-color: $color-bg-card;
+  padding: $spacing-lg;
+}
+
+.commentsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+}
+
+.commentsTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.commentsCount {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-normal;
+}
+
+.sortBtn {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.topCommentSection {
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-md;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.topCommentLabel {
+  display: inline-block;
+  font-size: 20rpx;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+  background: linear-gradient(135deg, $color-warning 0%, #FFAA33 100%);
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+  margin-bottom: $spacing-md;
+}
+
+.bottomInputBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+  background-color: $color-bg-card;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  z-index: 100;
+}
+
+.inputWrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background-color: $color-bg-hover;
+  border-radius: $radius-button;
+  padding: 0 $spacing-lg;
+  height: 72rpx;
+}
+
+.inputPlaceholder {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.bottomActions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.bottomAction {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all $transition-fast;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.bottomActionIcon {
+  font-size: 36rpx;
+}
+
+.bottomActionBadge {
+  font-size: 18rpx;
+  color: $color-text-tertiary;
+  margin-top: 2rpx;
+}
+
+.bottomActionActive .bottomActionBadge {
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.shareActionBadge {
+  color: $color-text-tertiary;
+}
+
+.inputModal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg $radius-lg 0 0;
+  padding: $spacing-lg;
+  padding-bottom: calc(#{$spacing-lg} + env(safe-area-inset-bottom));
+  box-shadow: 0 -8rpx 32rpx rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  transform: translateY(100%);
+  transition: transform $transition-base;
+}
+
+.inputModalVisible {
+  transform: translateY(0);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.modalCancel {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+.modalTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.modalSend {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+}
+
+.modalSendDisabled {
+  color: $color-text-disabled;
+}
+
+.modalTextarea {
+  width: 100%;
+  min-height: 200rpx;
+  background-color: $color-bg-hover;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  line-height: $line-height-normal;
+  box-sizing: border-box;
+}
+
+.modalHint {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: $spacing-sm;
+}
+
+.maskLayer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}

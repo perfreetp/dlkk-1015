@@ -1,0 +1,127 @@
+@use '@/styles/variables.scss' as *;
+
+.messageItem {
+  display: flex;
+  align-items: flex-start;
+  padding: $spacing-lg;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  margin-bottom: $spacing-md;
+  position: relative;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.92;
+  }
+}
+
+.unreadDot {
+  position: absolute;
+  top: $spacing-md;
+  right: $spacing-md;
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: $radius-round;
+  background-color: $color-error;
+}
+
+.avatarWrapper {
+  position: relative;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: $radius-round;
+  background-color: $color-bg-hover;
+}
+
+.typeIcon {
+  position: absolute;
+  bottom: -8rpx;
+  right: -8rpx;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+  border: 3rpx solid $color-bg-card;
+}
+
+.typeReply {
+  background-color: $color-primary-bg;
+  color: $color-primary;
+}
+
+.typeLike {
+  background-color: #FFECE8;
+  color: $color-error;
+}
+
+.typeSystem {
+  background-color: #E8F3FF;
+  color: $color-info;
+}
+
+.typeActivity {
+  background-color: #FFF0E6;
+  color: $color-warning;
+}
+
+.messageContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.messageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+  padding-right: $spacing-lg;
+}
+
+.messageTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  flex: 1;
+  @include text-ellipsis;
+  margin-right: $spacing-sm;
+}
+
+.isRead {
+  font-weight: $font-weight-normal;
+  color: $color-text-secondary;
+}
+
+.messageTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  flex-shrink: 0;
+}
+
+.messagePreview {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  @include text-ellipsis-multi(2);
+  margin-bottom: $spacing-xs;
+}
+
+.referencePost {
+  display: inline-block;
+  margin-top: 4rpx;
+  padding: 6rpx 14rpx;
+  background-color: $color-bg-hover;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  @include text-ellipsis;
+  max-width: 100%;
+}

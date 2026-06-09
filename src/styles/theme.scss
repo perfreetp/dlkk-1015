@@ -1,0 +1,61 @@
+// ============================================
+// 主题配色变量 - 小区论坛小程序
+// ============================================
+
+// 品牌主题色：社区绿
+$color-primary: #00B578;
+$color-primary-light: #34D399;
+$color-primary-dark: #059669;
+$color-primary-bg: rgba(0, 181, 120, 0.08);
+
+// 功能色
+$color-success: #00B42A;
+$color-warning: #FF7D00;
+$color-error: #F53F3F;
+$color-info: #165DFF;
+
+// 背景色
+$color-bg-page: #F7F9FA;
+$color-bg-card: #FFFFFF;
+$color-bg-hover: #F2F3F5;
+
+// 文本色
+$color-text-primary: #1D2129;
+$color-text-secondary: #4E5969;
+$color-text-tertiary: #86909C;
+$color-text-disabled: #C9CDD4;
+$color-text-white: #FFFFFF;
+
+// 边框色
+$color-border: #E5E6EB;
+$color-divider: #F2F3F5;
+
+// ============================================
+// 业务相关颜色变量
+// ============================================
+
+// 分类标签颜色
+$color-tag-idle-bg: #FFF7E6;
+$color-tag-idle-text: #FF7D00;
+$color-tag-carpool-bg: #E8F3FF;
+$color-tag-carpool-text: #165DFF;
+$color-tag-repair-bg: #FFECE8;
+$color-tag-repair-text: #F53F3F;
+$color-tag-find-bg: #E8FFEA;
+$color-tag-find-text: #00B42A;
+$color-tag-help-bg: #F5F0FF;
+$color-tag-help-text: #722ED1;
+$color-tag-activity-bg: #FFF0E6;
+$color-tag-activity-text: #FF9500;
+$color-tag-notice-bg: #E6F4FF;
+$color-tag-notice-text: #0FC6C2;
+
+// 活动状态色
+$color-activity-hot: #FF3B30;
+$color-activity-ongoing: #00B578;
+$color-activity-ended: #86909C;
+
+// 认证状态色
+$color-auth-verified: #00B578;
+$color-auth-pending: #FF7D00;
+$color-auth-unverified: #86909C;

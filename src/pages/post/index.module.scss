@@ -1,0 +1,341 @@
+@use '@/styles/variables.scss' as *;
+
+.postPage {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: 180rpx;
+}
+
+.formSection {
+  padding: $spacing-lg $page-padding;
+}
+
+.categorySection {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.sectionLabel {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.required {
+  color: $color-error;
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-sm;
+}
+
+.categoryItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-md $spacing-xs;
+  border-radius: $radius-md;
+  border: 2rpx solid $color-border;
+  transition: all $transition-fast;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.categoryItemActive {
+  border-color: $color-primary;
+  background-color: $color-primary-bg;
+}
+
+.categoryIcon {
+  font-size: 36rpx;
+  margin-bottom: 4rpx;
+}
+
+.categoryName {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.categoryItemActive .categoryName {
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.titleSection {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.titleInput {
+  width: 100%;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  padding: 0;
+  line-height: $line-height-normal;
+}
+
+.titleCounter {
+  text-align: right;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: $spacing-xs;
+}
+
+.contentSection {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.contentTextarea {
+  width: 100%;
+  min-height: 280rpx;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  line-height: $line-height-loose;
+  padding: 0;
+  background-color: transparent;
+}
+
+.contentCounter {
+  text-align: right;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: $spacing-xs;
+}
+
+.imageSection {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.imageGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-sm;
+}
+
+.imageItem {
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+  border-radius: $radius-md;
+  overflow: hidden;
+  background-color: $color-bg-hover;
+}
+
+.imageContent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.removeBtn {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: $radius-round;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: $color-text-white;
+  font-size: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.addImageBtn {
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+  border-radius: $radius-md;
+  border: 2rpx dashed $color-border;
+  background-color: transparent;
+  transition: all $transition-fast;
+
+  &:active {
+    opacity: 0.8;
+    background-color: $color-bg-hover;
+  }
+}
+
+.addImageContent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.addIcon {
+  font-size: 48rpx;
+  color: $color-text-tertiary;
+  margin-bottom: 4rpx;
+}
+
+.addText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.imageCount {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: $spacing-md;
+}
+
+.optionsSection {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.optionItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md 0;
+  border-top: 1rpx solid $color-divider;
+
+  &:first-child {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+}
+
+.optionLeft {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.optionIcon {
+  font-size: 32rpx;
+}
+
+.optionText {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.optionDesc {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.switch {
+  width: 100rpx;
+  height: 56rpx;
+  border-radius: $radius-round;
+  background-color: $color-bg-hover;
+  position: relative;
+  transition: all $transition-base;
+  flex-shrink: 0;
+}
+
+.switchActive {
+  background-color: $color-primary;
+}
+
+.switchKnob {
+  position: absolute;
+  top: 4rpx;
+  left: 4rpx;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: $radius-round;
+  background-color: $color-bg-card;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
+  transition: all $transition-base;
+}
+
+.switchActive .switchKnob {
+  left: calc(100% - 52rpx);
+}
+
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+  background-color: $color-bg-card;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.08);
+  display: flex;
+  gap: $spacing-md;
+  z-index: 100;
+}
+
+.draftBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  background-color: $color-bg-hover;
+  color: $color-text-secondary;
+  transition: all $transition-fast;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.submitBtn {
+  @include button-reset;
+  flex: 2;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  transition: all $transition-fast;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
+.submitBtnDisabled {
+  background: $color-bg-hover;
+  color: $color-text-disabled;
+}

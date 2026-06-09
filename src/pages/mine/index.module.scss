@@ -1,0 +1,240 @@
+@use '@/styles/variables.scss' as *;
+
+.minePage {
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgba(0, 181, 120, 0.08) 0%, $color-bg-page 30%);
+  padding-bottom: 60rpx;
+}
+
+.userHeader {
+  padding: $spacing-xl $page-padding;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.userHeader::before {
+  content: '';
+  position: absolute;
+  top: -80rpx;
+  right: -60rpx;
+  width: 240rpx;
+  height: 240rpx;
+  border-radius: $radius-round;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.userHeader::after {
+  content: '';
+  position: absolute;
+  bottom: -40rpx;
+  right: 120rpx;
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: $radius-round;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.avatar {
+  width: 144rpx;
+  height: 144rpx;
+  border-radius: $radius-round;
+  border: 6rpx solid rgba(255, 255, 255, 0.4);
+  background-color: $color-bg-hover;
+  flex-shrink: 0;
+}
+
+.userMeta {
+  margin-left: $spacing-lg;
+  flex: 1;
+  min-width: 0;
+}
+
+.userNameRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+  gap: $spacing-sm;
+}
+
+.userName {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  @include text-ellipsis;
+  max-width: 300rpx;
+}
+
+.editIcon {
+  font-size: $font-size-lg;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.authBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4rpx;
+  padding: 6rpx 16rpx;
+  border-radius: $radius-button;
+  background-color: rgba(255, 255, 255, 0.25);
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+  margin-bottom: $spacing-xs;
+}
+
+.userDesc {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.statsSection {
+  display: flex;
+  justify-content: space-around;
+  background-color: $color-bg-card;
+  margin: -$spacing-lg $page-padding 0;
+  border-radius: $radius-lg;
+  padding: $spacing-lg 0;
+  box-shadow: $shadow-card;
+  position: relative;
+  z-index: 2;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.statNumber {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+}
+
+.statLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.statDivider {
+  width: 1rpx;
+  height: 60rpx;
+  background-color: $color-divider;
+  align-self: center;
+}
+
+.menuSection {
+  padding: $spacing-lg $page-padding 0;
+}
+
+.menuGroup {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+  overflow: hidden;
+}
+
+.menuGroupTitle {
+  padding: $spacing-md $spacing-lg $spacing-xs;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-medium;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  padding: $spacing-lg;
+  transition: all $transition-fast;
+  border-top: 1rpx solid $color-divider;
+
+  &:first-child {
+    border-top: none;
+  }
+
+  &:active {
+    background-color: $color-bg-hover;
+  }
+}
+
+.menuIcon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+}
+
+.iconBg1 { background: linear-gradient(135deg, #E8F3FF 0%, #B8D4FF 100%); }
+.iconBg2 { background: linear-gradient(135deg, #E8FFEA 0%, #B8E8BC 100%); }
+.iconBg3 { background: linear-gradient(135deg, #FFF7E6 0%, #FFE4B8 100%); }
+.iconBg4 { background: linear-gradient(135deg, #F5F0FF 0%, #D8C5FF 100%); }
+.iconBg5 { background: linear-gradient(135deg, #FFECE8 0%, #FFC8BF 100%); }
+.iconBg6 { background: linear-gradient(135deg, #E6F4FF 0%, #B8E0FF 100%); }
+.iconBg7 { background: linear-gradient(135deg, #F2F3F5 0%, #E5E6EB 100%); }
+
+.menuContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.menuTitle {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  margin-bottom: 4rpx;
+}
+
+.menuDesc {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.menuRight {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.badge {
+  min-width: 36rpx;
+  height: 36rpx;
+  border-radius: $radius-round;
+  background-color: $color-error;
+  color: $color-text-white;
+  font-size: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10rpx;
+}
+
+.arrow {
+  font-size: $font-size-lg;
+  color: $color-text-tertiary;
+}
+
+.versionInfo {
+  text-align: center;
+  padding: $spacing-xl;
+  font-size: $font-size-xs;
+  color: $color-text-disabled;
+}

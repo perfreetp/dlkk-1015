@@ -1,0 +1,163 @@
+@use '@/styles/variables.scss' as *;
+
+.messagePage {
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgba(22, 93, 255, 0.04) 0%, $color-bg-page 20%);
+  padding-bottom: 60rpx;
+}
+
+.header {
+  padding: $spacing-lg $page-padding $spacing-md;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+}
+
+.pageTitle {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.readAll {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-button;
+  background-color: $color-primary-bg;
+  transition: all $transition-fast;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.messageTypes {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-sm;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.typeItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all $transition-fast;
+  position: relative;
+
+  &:active {
+    transform: scale(0.92);
+    opacity: 0.8;
+  }
+}
+
+.typeIcon {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: $radius-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  margin-bottom: $spacing-xs;
+  position: relative;
+}
+
+.type1 { background: linear-gradient(135deg, rgba(0, 181, 120, 0.15) 0%, rgba(0, 181, 120, 0.05) 100%); }
+.type2 { background: linear-gradient(135deg, rgba(245, 63, 63, 0.15) 0%, rgba(245, 63, 63, 0.05) 100%); }
+.type3 { background: linear-gradient(135deg, rgba(22, 93, 255, 0.15) 0%, rgba(22, 93, 255, 0.05) 100%); }
+.type4 { background: linear-gradient(135deg, rgba(255, 149, 0, 0.15) 0%, rgba(255, 149, 0, 0.05) 100%); }
+
+.unreadBadge {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  border-radius: $radius-round;
+  background-color: $color-error;
+  color: $color-text-white;
+  font-size: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8rpx;
+  border: 3rpx solid $color-bg-card;
+}
+
+.typeName {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+}
+
+.typeActive .typeName {
+  color: $color-primary;
+}
+
+.tabBar {
+  display: flex;
+  background-color: $color-bg-card;
+  border-radius: $radius-button;
+  padding: 6rpx;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.tabItem {
+  flex: 1;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-button;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  transition: all $transition-base;
+  position: relative;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.tabItemActive {
+  background: linear-gradient(135deg, $color-info 0%, #6B9EFF 100%);
+  color: $color-text-white;
+  box-shadow: 0 4rpx 12rpx rgba(22, 93, 255, 0.25);
+}
+
+.messageList {
+  padding: 0 $page-padding;
+}
+
+.listHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.listTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.listCount {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}

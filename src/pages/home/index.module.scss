@@ -1,0 +1,182 @@
+@use '@/styles/variables.scss' as *;
+
+.homePage {
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgba(0, 181, 120, 0.06) 0%, $color-bg-page 30%);
+  padding-bottom: 180rpx;
+}
+
+.header {
+  padding: $spacing-lg $page-padding $spacing-md;
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  background-color: $color-bg-card;
+  border-radius: $radius-button;
+  padding: 0 $spacing-lg;
+  height: 80rpx;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-lg;
+}
+
+.searchIcon {
+  font-size: $font-size-xl;
+  margin-right: $spacing-sm;
+}
+
+.searchText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+.quickEntries {
+  display: flex;
+  justify-content: space-between;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.quickEntry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  transition: all $transition-fast;
+
+  &:active {
+    transform: scale(0.92);
+    opacity: 0.8;
+  }
+}
+
+.entryIcon {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: $radius-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  margin-bottom: $spacing-xs;
+}
+
+.entry1 { background: linear-gradient(135deg, #FFF7E6 0%, #FFE4B8 100%); }
+.entry2 { background: linear-gradient(135deg, #E8F3FF 0%, #B8D4FF 100%); }
+.entry3 { background: linear-gradient(135deg, #E8FFEA 0%, #B8E8BC 100%); }
+.entry4 { background: linear-gradient(135deg, #F5F0FF 0%, #D8C5FF 100%); }
+
+.entryName {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+}
+
+.tabSection {
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-md;
+}
+
+.tabBar {
+  display: flex;
+  background-color: $color-bg-card;
+  border-radius: $radius-button;
+  padding: 6rpx;
+  box-shadow: $shadow-card;
+}
+
+.tabItem {
+  flex: 1;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-button;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.tabItemActive {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  box-shadow: 0 4rpx 12rpx rgba(0, 181, 120, 0.3);
+}
+
+.buildingFilter {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md 0;
+}
+
+.filterLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-right: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.buildingList {
+  @include scroll-x-container;
+  flex: 1;
+}
+
+.buildingChip {
+  @include scroll-x-item('auto');
+  padding: 8rpx 24rpx;
+  margin-right: $spacing-sm;
+  border-radius: $radius-button;
+  background-color: $color-bg-card;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  border: 1rpx solid $color-border;
+  transition: all $transition-fast;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.buildingChipActive {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  border-color: transparent;
+}
+
+.postList {
+  padding: 0 $page-padding;
+}
+
+.fab {
+  position: fixed;
+  right: $spacing-lg;
+  bottom: 160rpx;
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: $radius-round;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(0, 181, 120, 0.4);
+  z-index: 999;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.92);
+  }
+}
+
+.fabIcon {
+  font-size: 48rpx;
+  color: $color-text-white;
+}

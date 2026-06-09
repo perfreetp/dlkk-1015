@@ -1,0 +1,158 @@
+@use '@/styles/variables.scss' as *;
+
+.categoryPage {
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgba(0, 181, 120, 0.04) 0%, $color-bg-page 20%);
+  padding-bottom: 60rpx;
+}
+
+.header {
+  padding: $spacing-lg $page-padding;
+}
+
+.pageTitle {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.pageSubtitle {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-md;
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-lg;
+}
+
+.categoryCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.92;
+  }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.categoryIcon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  margin-right: $spacing-md;
+}
+
+.categoryMeta {
+  flex: 1;
+  min-width: 0;
+}
+
+.categoryName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+}
+
+.postCount {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.categoryDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  @include text-ellipsis-multi(2);
+  margin-bottom: $spacing-md;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.viewPosts {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.hotTag {
+  font-size: 20rpx;
+  padding: 4rpx 10rpx;
+  border-radius: $radius-xs;
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+  color: $color-text-white;
+}
+
+.postsSection {
+  padding: 0 $page-padding;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.sectionTitleIcon {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+}
+
+.viewMore {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.categoryBg1 { background: linear-gradient(135deg, #FFF7E6 0%, #FFE4B8 100%); }
+.categoryBg2 { background: linear-gradient(135deg, #E8F3FF 0%, #B8D4FF 100%); }
+.categoryBg3 { background: linear-gradient(135deg, #FFECE8 0%, #FFC8BF 100%); }
+.categoryBg4 { background: linear-gradient(135deg, #E8FFEA 0%, #B8E8BC 100%); }
+.categoryBg5 { background: linear-gradient(135deg, #F5F0FF 0%, #D8C5FF 100%); }
+.categoryBg6 { background: linear-gradient(135deg, #FFF0E6 0%, #FFD4B8 100%); }
+.categoryBg7 { background: linear-gradient(135deg, #E6F4FF 0%, #B8E0FF 100%); }
+.categoryBg8 { background: linear-gradient(135deg, #F2F3F5 0%, #E5E6EB 100%); }
