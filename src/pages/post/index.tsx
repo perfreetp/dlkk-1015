@@ -9,7 +9,7 @@ import styles from './index.module.scss';
 
 const PostPage: React.FC = () => {
   const router = useRouter();
-  const { addPost, addDraft, user, updateDraft, drafts } = useApp();
+  const { addPost, addDraft, removeDraft, user, updateDraft, drafts } = useApp();
   const initialCategory = (router.params?.category as PostCategory) || 'idle';
   const editDraftId = router.params?.draftId;
 
@@ -50,22 +50,20 @@ const PostPage: React.FC = () => {
       sourceType: ['album', 'camera'],
       success: (res) => {
         const newImages = res.tempFilePaths || res.tempFiles?.map(f => f.path) || [];
-        setImages((prev) => {
-          const combined = [...prev, ...newImages];
-          return combined.slice(0, IMAGE_MAX);
-        });
-        Taro.showToast({ title: `已添加${newImages.length}张图片`, icon: 'success' });
+        if (newImages.length > 0) {
+          setImages((prev) => {
+            const combined = [...prev, ...newImages];
+            return combined.slice(0, IMAGE_MAX);
+          });
+          Taro.showToast({ title: `已添加${newImages.length}张图片`, icon: 'success' });
+        }
       },
       fail: (err) => {
         console.warn('[PostPage] chooseImage fail:', err);
-        const fallbackImages = [
-          'https://picsum.photos/id/1062/600/600',
-          'https://picsum.photos/id/1074/600/600',
-          'https://picsum.photos/id/1084/600/600'
-        ];
-        const randomImgs = fallbackImages.slice(0, Math.min(remainCount, 3));
-        setImages((prev) => [...prev, ...randomImgs].slice(0, IMAGE_MAX));
-        Taro.showToast({ title: '已添加示例图片', icon: 'none' });
+        if (err && typeof err === 'object' && 'errMsg' in err && String((err as any).errMsg || '').includes('cancel')) {
+          return;
+        }
+        Taro.showToast({ title: '图片选择失败，请重试', icon: 'none' });
       }
     });
   };
@@ -164,7 +162,7 @@ const PostPage: React.FC = () => {
           setTimeout(() => {
             addPost(newPost);
             if (editDraftId) {
-              // 发布后删除对应草稿
+              removeDraft(editDraftId);
             }
             Taro.hideLoading();
             Taro.showToast({ title: '发布成功', icon: 'success' });

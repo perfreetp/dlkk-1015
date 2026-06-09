@@ -4,7 +4,6 @@ import Taro, { usePullDownRefresh } from '@tarojs/taro';
 import classnames from 'classnames';
 import ActivityCard from '@/components/ActivityCard';
 import EmptyState from '@/components/EmptyState';
-import { Activity } from '@/types';
 import { formatNumber, formatTime, formatDateTime } from '@/utils';
 import { useApp } from '@/store/AppContext';
 import styles from './index.module.scss';
@@ -15,7 +14,12 @@ const ActivityPage: React.FC = () => {
   const { activities, joinActivity, leaveActivity } = useApp();
   const [activeTab, setActiveTab] = useState<TabType>('ongoing');
   const [showParticipantsModal, setShowParticipantsModal] = useState(false);
-  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
+
+  const selectedActivity = useMemo(() => {
+    if (!selectedActivityId) return null;
+    return activities.find(a => a.id === selectedActivityId) || null;
+  }, [selectedActivityId, activities]);
 
   const hotCount = useMemo(
     () => activities.filter((a) => a.isHot && a.status !== 'ended').length,
@@ -77,7 +81,7 @@ const ActivityPage: React.FC = () => {
   const handleViewParticipants = useCallback((id: string) => {
     const activity = activities.find((a) => a.id === id);
     if (activity) {
-      setSelectedActivity(activity);
+      setSelectedActivityId(id);
       setShowParticipantsModal(true);
     }
   }, [activities]);
@@ -86,7 +90,7 @@ const ActivityPage: React.FC = () => {
     console.log('[ActivityPage] Activity clicked:', id);
     const activity = activities.find((a) => a.id === id);
     if (activity) {
-      setSelectedActivity(activity);
+      setSelectedActivityId(id);
       setShowParticipantsModal(true);
     }
   }, [activities]);
@@ -270,12 +274,7 @@ const ActivityPage: React.FC = () => {
               ) : selectedActivity.isJoined ? (
                 <Button
                   className={classnames(styles.modalBtn, styles.modalBtnJoined)}
-                  onClick={() => {
-                    handleJoin(selectedActivity.id);
-                    setSelectedActivity(
-                      activities.find((a) => a.id === selectedActivity.id) || null
-                    );
-                  }}
+                  onClick={() => handleJoin(selectedActivity.id)}
                 >
                   取消报名
                 </Button>
@@ -286,14 +285,7 @@ const ActivityPage: React.FC = () => {
               ) : (
                 <Button
                   className={classnames(styles.modalBtn, styles.modalBtnPrimary)}
-                  onClick={() => {
-                    handleJoin(selectedActivity.id);
-                    setTimeout(() => {
-                      setSelectedActivity(
-                        activities.find((a) => a.id === selectedActivity.id) || null
-                      );
-                    }, 100);
-                  }}
+                  onClick={() => handleJoin(selectedActivity.id)}
                 >
                   立即报名
                 </Button>

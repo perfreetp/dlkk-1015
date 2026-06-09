@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
+import classnames from 'classnames';
 import { categories } from '@/data/categories';
 import PostCard from '@/components/PostCard';
 import { Category } from '@/types';

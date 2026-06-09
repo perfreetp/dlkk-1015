@@ -1,10 +1,22 @@
-import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo, useEffect, ReactNode } from 'react';
 import { UserInfo, Draft, Post, Message, Activity, Comment, ActivityParticipant, PostCategory } from '@/types';
 import { mockUser } from '@/data/user';
 import { mockPosts, mockComments, getPostsByCategory as _getPostsByCategory } from '@/data/posts';
 import { mockMessages } from '@/data/messages';
 import { mockActivities } from '@/data/activities';
 import { categoryNameMap } from '@/data/categories';
+
+const STORAGE_KEY = 'community_forum_state_v1';
+
+interface PersistedState {
+  user: UserInfo;
+  drafts: Draft[];
+  blacklist: string[];
+  posts: Post[];
+  comments: Comment[];
+  messages: Message[];
+  activities: Activity[];
+}
 
 interface AppContextType {
   user: UserInfo;
@@ -51,14 +63,42 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+const loadFromStorage = (): Partial<PersistedState> => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      console.log('[AppContext] Loaded state from localStorage');
+      return parsed;
+    }
+  } catch (e) {
+    console.warn('[AppContext] Failed to load from localStorage:', e);
+  }
+  return {};
+};
+
+const saveToStorage = (state: PersistedState) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.warn('[AppContext] Failed to save to localStorage:', e);
+  }
+};
+
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<UserInfo>(mockUser);
-  const [drafts, setDrafts] = useState<Draft[]>([]);
-  const [blacklist, setBlacklist] = useState<string[]>([]);
-  const [posts, setPosts] = useState<Post[]>(mockPosts);
-  const [comments, setComments] = useState<Comment[]>(mockComments);
-  const [messages, setMessages] = useState<Message[]>(mockMessages);
-  const [activities, setActivities] = useState<Activity[]>(mockActivities);
+  const stored = loadFromStorage();
+
+  const [user, setUser] = useState<UserInfo>(stored.user || mockUser);
+  const [drafts, setDrafts] = useState<Draft[]>(stored.drafts || []);
+  const [blacklist, setBlacklist] = useState<string[]>(stored.blacklist || []);
+  const [posts, setPosts] = useState<Post[]>(stored.posts || mockPosts);
+  const [comments, setComments] = useState<Comment[]>(stored.comments || mockComments);
+  const [messages, setMessages] = useState<Message[]>(stored.messages || mockMessages);
+  const [activities, setActivities] = useState<Activity[]>(stored.activities || mockActivities);
+
+  useEffect(() => {
+    saveToStorage({ user, drafts, blacklist, posts, comments, messages, activities });
+  }, [user, drafts, blacklist, posts, comments, messages, activities]);
 
   const unreadCount = useMemo(() => messages.filter(m => !m.isRead).length, [messages]);
 
@@ -111,6 +151,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const deletePost = useCallback((id: string) => {
     setPosts(prev => prev.filter(p => p.id !== id));
     setComments(prev => prev.filter(c => c.postId !== id));
+    setUser(prev => ({ ...prev, postCount: Math.max(0, prev.postCount - 1) }));
   }, []);
 
   const getPostById = useCallback((id: string) => {
@@ -130,20 +171,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   }, []);
 
   const togglePostCollect = useCallback((id: string) => {
-    setPosts(prev => prev.map(p => {
-      if (p.id !== id) return p;
-      const newCollected = !p.isCollected;
-      return {
-        ...p,
-        isCollected: newCollected,
-        collectCount: newCollected ? p.collectCount + 1 : Math.max(0, p.collectCount - 1)
-      };
-    }));
-    setUser(prev => ({
-      ...prev,
-      collectCount: prev.collectCount + (posts.find(p => p.id === id)?.isCollected ? -1 : 1)
-    }));
-  }, [posts]);
+    setPosts(prev => {
+      const target = prev.find(p => p.id === id);
+      const delta = target?.isCollected ? -1 : 1;
+      setUser(prevUser => ({
+        ...prevUser,
+        collectCount: Math.max(0, prevUser.collectCount + delta)
+      }));
+      return prev.map(p => {
+        if (p.id !== id) return p;
+        const newCollected = !p.isCollected;
+        return {
+          ...p,
+          isCollected: newCollected,
+          collectCount: newCollected ? p.collectCount + 1 : Math.max(0, p.collectCount - 1)
+        };
+      });
+    });
+  }, []);
 
   const getMyPosts = useCallback(() => {
     return posts.filter(p => p.authorId === user.id);
