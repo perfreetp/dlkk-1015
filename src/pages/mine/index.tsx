@@ -151,21 +151,25 @@ const MinePage: React.FC = () => {
       content: '确定要将这条草稿发布出去吗？',
       success: (res) => {
         if (res.confirm) {
+          const categoryName = categoryNameMap[draft.category] || '其他闲聊';
           addPost({
             id: `post_${Date.now()}`,
-            title: draft.title,
-            content: draft.content,
+            title: draft.title || '(无标题)',
+            content: draft.content || '',
             category: draft.category,
-            images: draft.images,
+            categoryName,
+            images: draft.images || [],
             isAnonymous: draft.isAnonymous,
             authorId: user.id,
-            authorName: draft.isAnonymous ? '匿名用户' : user.nickname,
+            authorName: draft.isAnonymous ? '匿名邻居' : user.nickname,
             authorAvatar: user.avatar,
+            authorBuilding: user.building,
             building: user.building,
             createdAt: new Date().toISOString(),
             likeCount: 0,
             commentCount: 0,
             collectCount: 0,
+            viewCount: 1,
             isLiked: false,
             isCollected: false,
             isHot: false,
@@ -173,6 +177,10 @@ const MinePage: React.FC = () => {
           });
           removeDraft(draft.id);
           Taro.showToast({ title: '发布成功', icon: 'success' });
+          setTimeout(() => {
+            setShowDraftsModal(false);
+            Taro.switchTab({ url: '/pages/home/index' });
+          }, 800);
         }
       }
     });

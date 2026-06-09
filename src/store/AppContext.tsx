@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useMemo, useEffect, ReactNode } from 'react';
+import Taro from '@tarojs/taro';
 import { UserInfo, Draft, Post, Message, Activity, Comment, ActivityParticipant, PostCategory } from '@/types';
 import { mockUser } from '@/data/user';
 import { mockPosts, mockComments, getPostsByCategory as _getPostsByCategory } from '@/data/posts';
@@ -65,23 +66,23 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const loadFromStorage = (): Partial<PersistedState> => {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = Taro.getStorageSync(STORAGE_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw);
-      console.log('[AppContext] Loaded state from localStorage');
+      const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      console.log('[AppContext] Loaded state from Taro storage');
       return parsed;
     }
   } catch (e) {
-    console.warn('[AppContext] Failed to load from localStorage:', e);
+    console.warn('[AppContext] Failed to load from Taro storage:', e);
   }
   return {};
 };
 
 const saveToStorage = (state: PersistedState) => {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    Taro.setStorageSync(STORAGE_KEY, JSON.stringify(state));
   } catch (e) {
-    console.warn('[AppContext] Failed to save to localStorage:', e);
+    console.warn('[AppContext] Failed to save to Taro storage:', e);
   }
 };
 

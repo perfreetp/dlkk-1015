@@ -115,7 +115,9 @@ const PostPage: React.FC = () => {
       addDraft(draft);
       Taro.showToast({ title: '已保存到草稿箱', icon: 'success' });
     }
-    setTimeout(() => Taro.navigateBack(), 800);
+    setTimeout(() => {
+      Taro.switchTab({ url: '/pages/mine/index' });
+    }, 800);
   };
 
   const handleSubmit = () => {
@@ -167,7 +169,6 @@ const PostPage: React.FC = () => {
             Taro.hideLoading();
             Taro.showToast({ title: '发布成功', icon: 'success' });
             setTimeout(() => {
-              Taro.navigateBack();
               Taro.switchTab({ url: '/pages/home/index' });
             }, 800);
           }, 600);

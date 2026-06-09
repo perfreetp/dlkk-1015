@@ -24,7 +24,12 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, onJoin, onClick }
 
   const handleJoin = (e) => {
     e.stopPropagation();
-    if (activity.status === 'ended' || activity.status === 'full') return;
+    if (activity.status === 'ended') return;
+    if (activity.isJoined) {
+      if (onJoin) onJoin(activity.id);
+      return;
+    }
+    if (activity.status === 'full') return;
     if (onJoin) {
       onJoin(activity.id);
     }
@@ -37,19 +42,22 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, onJoin, onClick }
   };
 
   const getButtonClass = () => {
-    if (activity.status === 'ended' || activity.status === 'full') {
+    if (activity.status === 'ended') {
       return styles.buttonDisabled;
     }
     if (activity.isJoined) {
       return styles.buttonJoined;
+    }
+    if (activity.status === 'full') {
+      return styles.buttonDisabled;
     }
     return styles.buttonPrimary;
   };
 
   const getButtonText = () => {
     if (activity.status === 'ended') return '已结束';
-    if (activity.status === 'full') return '名额已满';
     if (activity.isJoined) return '取消报名';
+    if (activity.status === 'full') return '名额已满';
     return '立即报名';
   };
 
