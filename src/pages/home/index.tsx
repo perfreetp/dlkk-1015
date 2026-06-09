@@ -4,7 +4,6 @@ import Taro, { usePullDownRefresh, useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
 import PostCard from '@/components/PostCard';
 import EmptyState from '@/components/EmptyState';
-import { mockPosts, getHotPosts, getPostsByBuilding } from '@/data/posts';
 import { Post } from '@/types';
 import { useApp } from '@/store/AppContext';
 import styles from './index.module.scss';
@@ -12,11 +11,10 @@ import styles from './index.module.scss';
 type TabType = 'latest' | 'hot' | 'nearby';
 
 const HomePage: React.FC = () => {
-  const { user } = useApp();
+  const { user, posts, getHotPosts, getPostsByBuilding } = useApp();
   const [activeTab, setActiveTab] = useState<TabType>('latest');
   const [selectedBuilding, setSelectedBuilding] = useState<string>('all');
   const [searchText, setSearchText] = useState<string>('');
-  const [posts, setPosts] = useState<Post[]>(mockPosts);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const buildings = ['all', '1栋', '2栋', '3栋', '4栋', '5栋', '6栋', '7栋', '8栋'];
@@ -29,11 +27,11 @@ const HomePage: React.FC = () => {
         result = getHotPosts();
         break;
       case 'nearby':
-        result = selectedBuilding === 'all' ? mockPosts : getPostsByBuilding(selectedBuilding);
+        result = selectedBuilding === 'all' ? posts : getPostsByBuilding(selectedBuilding);
         break;
       case 'latest':
       default:
-        result = [...mockPosts].sort((a, b) =>
+        result = [...posts].sort((a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
     }
@@ -48,7 +46,7 @@ const HomePage: React.FC = () => {
     }
 
     return result;
-  }, [activeTab, selectedBuilding, searchText]);
+  }, [activeTab, selectedBuilding, searchText, posts, getHotPosts, getPostsByBuilding]);
 
   const displayPosts = useMemo(() => getPosts(), [getPosts]);
 
@@ -56,7 +54,6 @@ const HomePage: React.FC = () => {
     console.log('[HomePage] Pull down refresh');
     setIsRefreshing(true);
     setTimeout(() => {
-      setPosts([...mockPosts]);
       setIsRefreshing(false);
       Taro.stopPullDownRefresh();
       Taro.showToast({ title: '刷新成功', icon: 'success' });

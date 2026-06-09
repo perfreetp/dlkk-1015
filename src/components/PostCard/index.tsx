@@ -4,6 +4,7 @@ import Taro from '@tarojs/taro';
 import classnames from 'classnames';
 import { Post } from '@/types';
 import { formatTime, formatNumber, getCategoryColor } from '@/utils';
+import { useApp } from '@/store/AppContext';
 import styles from './index.module.scss';
 
 interface PostCardProps {
@@ -12,6 +13,7 @@ interface PostCardProps {
 }
 
 const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
+  const { togglePostLike, togglePostCollect } = useApp();
   const categoryColor = getCategoryColor(post.category);
 
   const handleClick = () => {
@@ -22,6 +24,20 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
         url: `/pages/detail/index?id=${post.id}`
       });
     }
+  };
+
+  const handleLike = (e: any) => {
+    e.stopPropagation();
+    togglePostLike(post.id);
+  };
+
+  const handleCollect = (e: any) => {
+    e.stopPropagation();
+    togglePostCollect(post.id);
+    Taro.showToast({
+      title: post.isCollected ? '已取消收藏' : '收藏成功',
+      icon: 'none'
+    });
   };
 
   return (
@@ -38,6 +54,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
             <View className={styles.authorName}>
               <Text>{post.authorName}</Text>
               {post.isOwner && <Text className={styles.ownerTag}>楼主</Text>}
+              {post.isAnonymous && <Text className={styles.anonTag}>匿名</Text>}
             </View>
             <View className={styles.buildingInfo}>
               <Text>{post.building}</Text>
@@ -85,10 +102,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
         <View className={styles.footerRight}>
           <View
             className={classnames(styles.actionItem, post.isLiked && styles.actionItemActive)}
-            onClick={(e) => {
-              e.stopPropagation();
-              console.log('[PostCard] Like clicked, postId:', post.id);
-            }}
+            onClick={handleLike}
           >
             <Text className={styles.actionIcon}>{post.isLiked ? '❤️' : '🤍'}</Text>
             <Text>{formatNumber(post.likeCount)}</Text>
@@ -102,10 +116,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
           </View>
           <View
             className={classnames(styles.actionItem, post.isCollected && styles.actionItemActive)}
-            onClick={(e) => {
-              e.stopPropagation();
-              console.log('[PostCard] Collect clicked, postId:', post.id);
-            }}
+            onClick={handleCollect}
           >
             <Text className={styles.actionIcon}>{post.isCollected ? '⭐' : '☆'}</Text>
             <Text>{formatNumber(post.collectCount)}</Text>

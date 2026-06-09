@@ -1,10 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { View, Text, ScrollView, Button } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import classnames from 'classnames';
 import MessageItem from '@/components/MessageItem';
 import EmptyState from '@/components/EmptyState';
-import { mockMessages, getMessagesByType, getUnreadCountByType } from '@/data/messages';
 import { Message, MessageType } from '@/types';
 import { useApp } from '@/store/AppContext';
 import styles from './index.module.scss';
@@ -19,98 +18,133 @@ const typeConfig = [
 ];
 
 const MessagePage: React.FC = () => {
-  const { setUnreadCount } = useApp();
+  const {
+    messages,
+    markMessageRead,
+    markAllMessagesRead,
+    markMessagesReadByType,
+    getUnreadCountByType,
+    unreadCount
+  } = useApp();
+
   const [filterType, setFilterType] = useState<FilterType>('all');
-  const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [typeFilter, setTypeFilter] = useState<FilterType>('all');
 
   const displayMessages = useMemo(() => {
-    let result = getMessagesByType(filterType);
+    let result = messages;
+    if (filterType !== 'all') {
+      result = result.filter((m) => m.type === filterType);
+    }
     if (typeFilter !== 'all') {
       result = result.filter((m) => m.type === typeFilter);
     }
-    return messages.filter((m) => result.some((r) => r.id === m.id));
-  }, [filterType, typeFilter, messages]);
+    return result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [messages, filterType, typeFilter]);
 
-  const unreadCounts = useMemo(() => {
+  const typeUnreadCounts = useMemo(() => {
     return {
-      all: getUnreadCountByType('all'),
+      all: unreadCount,
       reply: getUnreadCountByType('reply'),
       like: getUnreadCountByType('like'),
       system: getUnreadCountByType('system'),
       activity: getUnreadCountByType('activity')
     };
-  }, [messages]);
+  }, [unreadCount, getUnreadCountByType]);
 
-  const handleFilterChange = (type: FilterType) => {
+  const listUnreadCount = useMemo(() => {
+    return displayMessages.filter((m) => !m.isRead).length;
+  }, [displayMessages]);
+
+  const handleFilterChange = useCallback((type: FilterType) => {
     setFilterType(type);
-    console.log('[MessagePage] Filter changed:', type);
-  };
+  }, []);
 
-  const handleTypeClick = (type: FilterType) => {
-    setTypeFilter(typeFilter === type ? 'all' : type);
-    console.log('[MessagePage] Type filter:', type);
-  };
+  const handleTypeClick = useCallback((type: FilterType) => {
+    const nextType = typeFilter === type ? 'all' : type;
+    setTypeFilter(nextType);
+    if (nextType !== 'all' && getUnreadCountByType(type) > 0) {
+      Taro.showModal({
+        title: '标记已读',
+        content: `是否将「${typeConfig.find(t => t.key === type)?.name}」类消息全部标记为已读？`,
+        success: (res) => {
+          if (res.confirm) {
+            markMessagesReadByType(type);
+            Taro.showToast({ title: '操作成功', icon: 'success' });
+          }
+        }
+      });
+    }
+  }, [typeFilter, getUnreadCountByType, markMessagesReadByType]);
 
-  const handleMessageClick = (message: Message) => {
+  const handleMessageClick = useCallback((message: Message) => {
     console.log('[MessagePage] Message clicked:', message.id);
-    setMessages((prev) =>
-      prev.map((m) => (m.id === message.id ? { ...m, isRead: true } : m))
-    );
-    setUnreadCount(prev.filter((m) => m.id !== message.id).length);
+    if (!message.isRead) {
+      markMessageRead(message.id);
+    }
 
     if (message.postId) {
       Taro.navigateTo({ url: `/pages/detail/index?id=${message.postId}` });
+    } else if (message.activityId) {
+      Taro.switchTab({ url: '/pages/activity/index' });
     } else {
-      Taro.showToast({ title: '查看消息详情', icon: 'none' });
+      Taro.showModal({
+        title: message.title,
+        content: message.content,
+        showCancel: false,
+        confirmText: '我知道了'
+      });
     }
-  };
+  }, [markMessageRead]);
 
-  const handleReadAll = () => {
+  const handleReadAll = useCallback(() => {
     console.log('[MessagePage] Mark all as read');
+    if (unreadCount === 0) return;
     Taro.showModal({
       title: '全部已读',
-      content: '确定将所有消息标记为已读吗？',
+      content: `确定将 ${unreadCount} 条未读消息标记为已读吗？`,
       success: (res) => {
         if (res.confirm) {
-          setMessages((prev) => prev.map((m) => ({ ...m, isRead: true })));
-          setUnreadCount(0);
+          markAllMessagesRead();
           Taro.showToast({ title: '已全部标记为已读', icon: 'success' });
         }
       }
     });
-  };
+  }, [unreadCount, markAllMessagesRead]);
 
   return (
     <View className={styles.messagePage}>
       <View className={styles.header}>
         <View className={styles.pageHeader}>
           <Text className={styles.pageTitle}>消息通知</Text>
-          {unreadCounts.all > 0 && (
+          {unreadCount > 0 && (
             <View className={styles.readAll} onClick={handleReadAll}>
-              ✔️ 全部已读
+              ✔️ 全部已读（{unreadCount}）
             </View>
           )}
         </View>
 
         <View className={styles.messageTypes}>
-          {typeConfig.map((type) => (
-            <View
-              key={type.key}
-              className={classnames(styles.typeItem, typeFilter === type.key && styles.typeActive)}
-              onClick={() => handleTypeClick(type.key)}
-            >
-              <View className={`${styles.typeIcon} ${type.className}`}>
-                {type.icon}
-                {unreadCounts[type.key] > 0 && (
-                  <Text className={styles.unreadBadge}>
-                    {unreadCounts[type.key] > 99 ? '99+' : unreadCounts[type.key]}
-                  </Text>
-                )}
+          {typeConfig.map((type) => {
+            const count = typeUnreadCounts[type.key];
+            return (
+              <View
+                key={type.key}
+                className={classnames(styles.typeItem, typeFilter === type.key && styles.typeActive)}
+                onClick={() => handleTypeClick(type.key)}
+              >
+                <View className={`${styles.typeIcon} ${type.className}`}>
+                  {type.icon}
+                  {count > 0 && (
+                    <Text className={styles.unreadBadge}>
+                      {count > 99 ? '99+' : count}
+                    </Text>
+                  )}
+                </View>
+                <Text className={styles.typeName}>{type.name}</Text>
+                {count > 0 && <Text className={styles.typeCount}>{count}</Text>}
               </View>
-              <Text className={styles.typeName}>{type.name}</Text>
-            </View>
-          ))}
+            );
+          })}
         </View>
 
         <View className={styles.tabBar}>
@@ -148,8 +182,8 @@ const MessagePage: React.FC = () => {
         <View className={styles.listHeader}>
           <Text className={styles.listTitle}>消息列表</Text>
           <Text className={styles.listCount}>
-            {displayMessages.length > 0 &&
-              `${displayMessages.filter((m) => !m.isRead).length} 条未读`}
+            {displayMessages.length > 0 && listUnreadCount > 0 &&
+              `${listUnreadCount} 条未读`}
           </Text>
         </View>
 

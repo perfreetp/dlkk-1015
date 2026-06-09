@@ -1,11 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { View, Text, Image, Button, Textarea, ScrollView } from '@tarojs/components';
-import Taro, { useRouter } from '@tarojs/taro';
+import Taro, { useRouter, useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
 import CommentItem from '@/components/CommentItem';
 import EmptyState from '@/components/EmptyState';
-import { getPostById, getCommentsByPostId } from '@/data/posts';
-import { Post, Comment } from '@/types';
+import { Comment } from '@/types';
 import { getCategoryColor, formatTime, formatNumber, formatDateTime } from '@/utils';
 import { useApp } from '@/store/AppContext';
 import styles from './index.module.scss';
@@ -13,57 +12,71 @@ import styles from './index.module.scss';
 const DetailPage: React.FC = () => {
   const router = useRouter();
   const postId = router.params?.id || 'post_004';
-  const { user, toggleBlacklist } = useApp();
+  const {
+    user,
+    toggleBlacklist,
+    getPostById,
+    getCommentsByPostId,
+    togglePostLike,
+    togglePostCollect,
+    toggleCommentLike,
+    toggleCommentTop,
+    addComment
+  } = useApp();
 
-  const [post, setPost] = useState<Post | undefined>(getPostById(postId));
-  const [comments, setComments] = useState<Comment[]>(getCommentsByPostId(postId));
-  const [isLiked, setIsLiked] = useState(post?.isLiked || false);
-  const [isCollected, setIsCollected] = useState(post?.isCollected || false);
-  const [likeCount, setLikeCount] = useState(post?.likeCount || 0);
-  const [collectCount, setCollectCount] = useState(post?.collectCount || 0);
+  const [postData, setPostData] = useState(() => getPostById(postId));
+  const [commentsData, setCommentsData] = useState(() => getCommentsByPostId(postId));
   const [isFollowed, setIsFollowed] = useState(false);
   const [showInputModal, setShowInputModal] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [replyToComment, setReplyToComment] = useState<Comment | null>(null);
 
+  useEffect(() => {
+    setPostData(getPostById(postId));
+    setCommentsData(getCommentsByPostId(postId));
+  }, [postId, getPostById, getCommentsByPostId]);
+
+  useDidShow(() => {
+    setPostData(getPostById(postId));
+    setCommentsData(getCommentsByPostId(postId));
+  });
+
   const categoryColor = useMemo(() => {
-    return post ? getCategoryColor(post.category) : { bg: '#F2F3F5', text: '#4E5969' };
-  }, [post]);
+    return postData
+      ? getCategoryColor(postData.category)
+      : { bg: '#F2F3F5', text: '#4E5969' };
+  }, [postData]);
 
   const topComment = useMemo(() => {
-    return comments.find((c) => c.isTop);
-  }, [comments]);
+    return commentsData.find((c) => c.isTop);
+  }, [commentsData]);
 
   const normalComments = useMemo(() => {
-    return comments.filter((c) => !c.isTop);
-  }, [comments]);
+    return commentsData
+      .filter((c) => !c.isTop)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [commentsData]);
 
-  const isOwner = post?.authorId === user.id;
+  const isOwner = postData?.authorId === user.id;
 
   const handleLike = () => {
-    console.log('[DetailPage] Like post:', postId);
-    const newLiked = !isLiked;
-    setIsLiked(newLiked);
-    setLikeCount((prev) => (newLiked ? prev + 1 : Math.max(0, prev - 1)));
-    Taro.showToast({
-      title: newLiked ? '点赞成功' : '已取消点赞',
-      icon: 'none'
-    });
+    if (!postData) return;
+    togglePostLike(postData.id);
+    setPostData(getPostById(postId));
   };
 
   const handleCollect = () => {
-    console.log('[DetailPage] Collect post:', postId);
-    const newCollected = !isCollected;
-    setIsCollected(newCollected);
-    setCollectCount((prev) => (newCollected ? prev + 1 : Math.max(0, prev - 1)));
+    if (!postData) return;
+    togglePostCollect(postData.id);
+    setPostData(getPostById(postId));
     Taro.showToast({
-      title: newCollected ? '收藏成功' : '已取消收藏',
+      title: postData.isCollected ? '已取消收藏' : '收藏成功',
       icon: 'none'
     });
   };
 
   const handleFollow = () => {
-    console.log('[DetailPage] Follow author:', post?.authorId);
+    console.log('[DetailPage] Follow author:', postData?.authorId);
     setIsFollowed(!isFollowed);
     Taro.showToast({
       title: isFollowed ? '已取消关注' : '关注成功',
@@ -75,7 +88,7 @@ const DetailPage: React.FC = () => {
     console.log('[DetailPage] Report post:', postId);
     Taro.showActionSheet({
       itemList: ['内容违规', '垃圾广告', '虚假信息', '人身攻击', '其他原因'],
-      success: (res) => {
+      success: () => {
         Taro.showModal({
           title: '举报提交',
           content: '感谢您的反馈，我们会尽快处理。',
@@ -86,8 +99,15 @@ const DetailPage: React.FC = () => {
   };
 
   const handleShare = () => {
-    console.log('[DetailPage] Share post:', postId);
     Taro.showToast({ title: '分享功能开发中', icon: 'none' });
+  };
+
+  const handlePreviewImage = (index: number) => {
+    if (!postData) return;
+    Taro.previewImage({
+      current: postData.images[index],
+      urls: postData.images
+    });
   };
 
   const handleOpenInput = (comment?: Comment) => {
@@ -106,7 +126,7 @@ const DetailPage: React.FC = () => {
   };
 
   const handleSendComment = () => {
-    if (!commentText.trim()) {
+    if (!commentText.trim() || !postData) {
       Taro.showToast({ title: '请输入评论内容', icon: 'none' });
       return;
     }
@@ -130,53 +150,41 @@ const DetailPage: React.FC = () => {
       createdAt: new Date().toISOString()
     };
 
-    setComments((prev) => [...prev, newComment]);
+    addComment(newComment);
+    setCommentsData(getCommentsByPostId(postId));
+    setPostData(getPostById(postId));
     Taro.showToast({ title: '评论成功', icon: 'success' });
     handleCloseInput();
   };
 
   const handleLikeComment = (commentId: string) => {
-    console.log('[DetailPage] Like comment:', commentId);
-    setComments((prev) =>
-      prev.map((c) => {
-        if (c.id !== commentId) return c;
-        const newLiked = !c.isLiked;
-        return {
-          ...c,
-          isLiked: newLiked,
-          likeCount: newLiked ? c.likeCount + 1 : Math.max(0, c.likeCount - 1)
-        };
-      })
-    );
+    toggleCommentLike(commentId);
+    setCommentsData(getCommentsByPostId(postId));
   };
 
   const handleTopComment = (commentId: string) => {
-    console.log('[DetailPage] Top comment:', commentId);
-    setComments((prev) =>
-      prev.map((c) => ({
-        ...c,
-        isTop: c.id === commentId ? !c.isTop : false
-      }))
-    );
+    if (!postData) return;
+    toggleCommentTop(postData.id, commentId);
+    setCommentsData(getCommentsByPostId(postId));
     Taro.showToast({ title: '操作成功', icon: 'success' });
   };
 
   const handleBlockAuthor = () => {
-    if (!post) return;
-    console.log('[DetailPage] Block author:', post.authorId);
+    if (!postData) return;
+    console.log('[DetailPage] Block author:', postData.authorId);
     Taro.showModal({
       title: '屏蔽用户',
-      content: `确定屏蔽「${post.authorName}」吗？屏蔽后将不再看到该用户的帖子和评论。`,
+      content: `确定屏蔽「${postData.authorName}」吗？屏蔽后将不再看到该用户的帖子和评论。`,
       success: (res) => {
         if (res.confirm) {
-          toggleBlacklist(post.authorId);
+          toggleBlacklist(postData.authorId);
           Taro.showToast({ title: '已加入黑名单', icon: 'success' });
         }
       }
     });
   };
 
-  if (!post) {
+  if (!postData) {
     return (
       <View className={styles.detailPage}>
         <EmptyState icon="😔" title="帖子不存在" description="该帖子可能已被删除或不存在" />
@@ -192,19 +200,19 @@ const DetailPage: React.FC = () => {
             <View className={styles.authorInfo}>
               <Image
                 className={styles.avatar}
-                src={post.authorAvatar}
+                src={postData.authorAvatar}
                 mode="aspectFill"
-                onError={(e) => console.error('[DetailPage] Author avatar error:', e)}
               />
               <View className={styles.authorMeta}>
                 <View className={styles.authorNameRow}>
-                  <Text className={styles.authorName}>{post.authorName}</Text>
-                  {post.isOwner && <Text className={styles.ownerTag}>楼主</Text>}
+                  <Text className={styles.authorName}>{postData.authorName}</Text>
+                  {postData.isOwner && <Text className={styles.ownerTag}>楼主</Text>}
+                  {postData.isAnonymous && <Text className={styles.anonTag}>匿名</Text>}
                 </View>
                 <View className={styles.buildingInfo}>
-                  <Text>🏠 {post.building}</Text>
+                  <Text>🏠 {postData.building}</Text>
                   <Text>·</Text>
-                  <Text>{formatTime(post.createdAt)}</Text>
+                  <Text>{formatTime(postData.createdAt)}</Text>
                 </View>
               </View>
               {!isOwner && (
@@ -221,22 +229,22 @@ const DetailPage: React.FC = () => {
               className={styles.categoryTag}
               style={{ backgroundColor: categoryColor.bg, color: categoryColor.text }}
             >
-              {post.categoryName}
+              {postData.categoryName}
             </Text>
 
-            <Text className={styles.postTitle}>{post.title}</Text>
+            <Text className={styles.postTitle}>{postData.title}</Text>
 
-            <Text className={styles.postContent}>{post.content}</Text>
+            <Text className={styles.postContent}>{postData.content}</Text>
 
-            {post.images.length > 0 && (
+            {postData.images.length > 0 && (
               <View className={styles.imageList}>
-                {post.images.map((img, idx) => (
+                {postData.images.map((img, idx) => (
                   <View className={styles.postImage} key={idx}>
                     <Image
                       src={img}
                       mode="widthFix"
                       style={{ width: '100%' }}
-                      onError={(e) => console.error('[DetailPage] Post image error:', e)}
+                      onClick={() => handlePreviewImage(idx)}
                     />
                   </View>
                 ))}
@@ -244,9 +252,9 @@ const DetailPage: React.FC = () => {
             )}
 
             <View className={styles.postMeta}>
-              <Text className={styles.metaLeft}>{formatDateTime(post.createdAt)}</Text>
+              <Text className={styles.metaLeft}>{formatDateTime(postData.createdAt)}</Text>
               <View className={styles.metaRight}>
-                <Text className={styles.metaAction}>👁️ {formatNumber(post.viewCount)}</Text>
+                <Text className={styles.metaAction}>👁️ {formatNumber(postData.viewCount)}</Text>
               </View>
             </View>
           </View>
@@ -254,18 +262,18 @@ const DetailPage: React.FC = () => {
 
         <View className={styles.actionSection}>
           <View
-            className={classnames(styles.actionBtn, isLiked && styles.actionActive)}
+            className={classnames(styles.actionBtn, postData.isLiked && styles.actionActive)}
             onClick={handleLike}
           >
-            <Text className={styles.actionIcon}>{isLiked ? '❤️' : '🤍'}</Text>
-            <Text className={styles.actionText}>{formatNumber(likeCount)}</Text>
+            <Text className={styles.actionIcon}>{postData.isLiked ? '❤️' : '🤍'}</Text>
+            <Text className={styles.actionText}>{formatNumber(postData.likeCount)}</Text>
           </View>
           <View
-            className={classnames(styles.actionBtn, isCollected && styles.actionActive)}
+            className={classnames(styles.actionBtn, postData.isCollected && styles.actionActive)}
             onClick={handleCollect}
           >
-            <Text className={styles.actionIcon}>{isCollected ? '⭐' : '☆'}</Text>
-            <Text className={styles.actionText}>{formatNumber(collectCount)}</Text>
+            <Text className={styles.actionIcon}>{postData.isCollected ? '⭐' : '☆'}</Text>
+            <Text className={styles.actionText}>{formatNumber(postData.collectCount)}</Text>
           </View>
           <View className={styles.actionBtn} onClick={() => handleOpenInput()}>
             <Text className={styles.actionIcon}>💬</Text>
@@ -291,7 +299,7 @@ const DetailPage: React.FC = () => {
           <View className={styles.commentsHeader}>
             <Text className={styles.commentsTitle}>
               全部评论
-              <Text className={styles.commentsCount}>({comments.length})</Text>
+              <Text className={styles.commentsCount}>({commentsData.length})</Text>
             </Text>
             <Text className={styles.sortBtn}>时间排序 ↓</Text>
           </View>
@@ -340,22 +348,38 @@ const DetailPage: React.FC = () => {
         </View>
         <View className={styles.bottomActions}>
           <View
-            className={classnames(styles.bottomAction, isLiked && styles.bottomActionActive)}
+            className={classnames(
+              styles.bottomAction,
+              postData.isLiked && styles.bottomActionActive
+            )}
             onClick={handleLike}
           >
-            <Text className={styles.bottomActionIcon}>{isLiked ? '❤️' : '🤍'}</Text>
-            <Text className={styles.bottomActionBadge}>{formatNumber(likeCount)}</Text>
+            <Text className={styles.bottomActionIcon}>
+              {postData.isLiked ? '❤️' : '🤍'}
+            </Text>
+            <Text className={styles.bottomActionBadge}>
+              {formatNumber(postData.likeCount)}
+            </Text>
           </View>
           <View
-            className={classnames(styles.bottomAction, isCollected && styles.bottomActionActive)}
+            className={classnames(
+              styles.bottomAction,
+              postData.isCollected && styles.bottomActionActive
+            )}
             onClick={handleCollect}
           >
-            <Text className={styles.bottomActionIcon}>{isCollected ? '⭐' : '☆'}</Text>
-            <Text className={styles.bottomActionBadge}>{formatNumber(collectCount)}</Text>
+            <Text className={styles.bottomActionIcon}>
+              {postData.isCollected ? '⭐' : '☆'}
+            </Text>
+            <Text className={styles.bottomActionBadge}>
+              {formatNumber(postData.collectCount)}
+            </Text>
           </View>
           <View className={styles.bottomAction} onClick={handleShare}>
             <Text className={styles.bottomActionIcon}>↗️</Text>
-            <Text className={classnames(styles.bottomActionBadge, styles.shareActionBadge)}>分享</Text>
+            <Text className={classnames(styles.bottomActionBadge, styles.shareActionBadge)}>
+              分享
+            </Text>
           </View>
         </View>
       </View>
