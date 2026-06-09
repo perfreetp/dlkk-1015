@@ -29,6 +29,9 @@ const PostPage: React.FC = () => {
         setSelectedCategory(draft.category);
         setImages(draft.images);
         setIsAnonymous(draft.isAnonymous);
+        if (typeof draft.showLocation === 'boolean') {
+          setShowLocation(draft.showLocation);
+        }
       }
     }
   }, [editDraftId, drafts]);
@@ -93,13 +96,15 @@ const PostPage: React.FC = () => {
       Taro.showToast({ title: '内容不能为空', icon: 'none' });
       return;
     }
+    const now = new Date().toISOString();
     if (editDraftId) {
       updateDraft(editDraftId, {
         title,
         content,
         category: selectedCategory,
         images,
-        isAnonymous
+        isAnonymous,
+        showLocation
       });
       Taro.showToast({ title: '草稿已更新', icon: 'success' });
     } else {
@@ -110,7 +115,9 @@ const PostPage: React.FC = () => {
         category: selectedCategory,
         images,
         isAnonymous,
-        updatedAt: new Date().toISOString()
+        showLocation,
+        updatedAt: now,
+        createdAt: now
       };
       addDraft(draft);
       Taro.showToast({ title: '已保存到草稿箱', icon: 'success' });

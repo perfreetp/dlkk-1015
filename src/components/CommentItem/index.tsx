@@ -73,12 +73,12 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, onLike, onReply, onT
                 <Text>回复</Text>
               </Button>
             </View>
-            {isOwner && !comment.isTop && (
+            {isOwner && (
               <Button
                 className={classnames(styles.replyButton, styles.actionItem)}
                 onClick={handleTop}
               >
-                <Text>📌 置顶</Text>
+                <Text>{comment.isTop ? '📌 取消置顶' : '📌 置顶'}</Text>
               </Button>
             )}
           </View>

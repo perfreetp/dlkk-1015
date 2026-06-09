@@ -119,7 +119,9 @@ export interface Draft {
   category: PostCategory;
   images: string[];
   isAnonymous: boolean;
+  showLocation: boolean;
   updatedAt: string;
+  createdAt: string;
 }
 
 export interface BlacklistItem {

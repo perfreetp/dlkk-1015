@@ -11,7 +11,7 @@ import styles from './index.module.scss';
 type TabType = 'latest' | 'hot' | 'nearby';
 
 const HomePage: React.FC = () => {
-  const { user, posts, getHotPosts, getPostsByBuilding } = useApp();
+  const { user, posts, getHotPosts, getPostsByBuilding, filterPostsByBlacklist } = useApp();
   const [activeTab, setActiveTab] = useState<TabType>('latest');
   const [selectedBuilding, setSelectedBuilding] = useState<string>('all');
   const [searchText, setSearchText] = useState<string>('');
@@ -36,6 +36,8 @@ const HomePage: React.FC = () => {
         );
     }
 
+    result = filterPostsByBlacklist(result);
+
     if (searchText.trim()) {
       const keyword = searchText.toLowerCase();
       result = result.filter(
@@ -46,7 +48,7 @@ const HomePage: React.FC = () => {
     }
 
     return result;
-  }, [activeTab, selectedBuilding, searchText, posts, getHotPosts, getPostsByBuilding]);
+  }, [activeTab, selectedBuilding, searchText, posts, getHotPosts, getPostsByBuilding, filterPostsByBlacklist]);
 
   const displayPosts = useMemo(() => getPosts(), [getPosts]);
 

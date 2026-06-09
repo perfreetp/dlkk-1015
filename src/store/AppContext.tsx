@@ -42,6 +42,10 @@ interface AppContextType {
   getHotPosts: () => Post[];
   getPostsByBuilding: (building: string) => Post[];
   getPostsByCategory: (category: string) => Post[];
+  getLikedPosts: () => Post[];
+  getCollectedPosts: () => Post[];
+  filterPostsByBlacklist: (posts: Post[]) => Post[];
+  filterCommentsByBlacklist: (comments: Comment[]) => Comment[];
 
   comments: Comment[];
   addComment: (comment: Comment) => void;
@@ -54,6 +58,7 @@ interface AppContextType {
   markAllMessagesRead: () => void;
   markMessagesReadByType: (type: string) => void;
   getUnreadCountByType: (type: string) => number;
+  addMessage: (message: Omit<Message, 'id' | 'createdAt' | 'isRead'>) => void;
 
   activities: Activity[];
   updateActivity: (id: string, updates: Partial<Activity>) => void;
@@ -208,6 +213,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return posts.filter(p => p.category === category);
   }, [posts]);
 
+  const getLikedPosts = useCallback(() => {
+    return posts.filter(p => p.isLiked);
+  }, [posts]);
+
+  const getCollectedPosts = useCallback(() => {
+    return posts.filter(p => p.isCollected);
+  }, [posts]);
+
+  const filterPostsByBlacklist = useCallback((postsToFilter: Post[]) => {
+    if (blacklist.length === 0) return postsToFilter;
+    return postsToFilter.filter(p => !blacklist.includes(p.authorId));
+  }, [blacklist]);
+
+  const filterCommentsByBlacklist = useCallback((commentsToFilter: Comment[]) => {
+    if (blacklist.length === 0) return commentsToFilter;
+    return commentsToFilter.filter(c => !blacklist.includes(c.authorId));
+  }, [blacklist]);
+
   const addComment = useCallback((comment: Comment) => {
     setComments(prev => [...prev, comment]);
     setPosts(prev => prev.map(p =>
@@ -256,6 +279,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (type === 'all') return messages.filter(m => !m.isRead).length;
     return messages.filter(m => !m.isRead && m.type === type).length;
   }, [messages]);
+
+  const addMessage = useCallback((messageData: Omit<Message, 'id' | 'createdAt' | 'isRead'>) => {
+    const newMsg: Message = {
+      id: `msg_${Date.now()}`,
+      isRead: false,
+      createdAt: new Date().toISOString(),
+      ...messageData
+    };
+    setMessages(prev => [newMsg, ...prev]);
+  }, []);
 
   const updateActivity = useCallback((id: string, updates: Partial<Activity>) => {
     setActivities(prev => prev.map(a => a.id === id ? { ...a, ...updates } : a));
@@ -324,6 +357,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         getHotPosts,
         getPostsByBuilding,
         getPostsByCategory,
+        getLikedPosts,
+        getCollectedPosts,
+        filterPostsByBlacklist,
+        filterCommentsByBlacklist,
         comments,
         addComment,
         getCommentsByPostId,
@@ -334,6 +371,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         markAllMessagesRead,
         markMessagesReadByType,
         getUnreadCountByType,
+        addMessage,
         activities,
         updateActivity,
         joinActivity,

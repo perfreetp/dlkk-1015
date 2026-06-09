@@ -21,13 +21,13 @@ const bgClasses = [
 ];
 
 const CategoryPage: React.FC = () => {
-  const { getPostsByCategory, posts } = useApp();
+  const { getPostsByCategory, filterPostsByBlacklist } = useApp();
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
   const categoryPosts = useMemo(() => {
     if (!selectedCategory) return [];
-    return getPostsByCategory(selectedCategory.key);
-  }, [selectedCategory, getPostsByCategory, posts]);
+    return filterPostsByBlacklist(getPostsByCategory(selectedCategory.key));
+  }, [selectedCategory, getPostsByCategory, filterPostsByBlacklist]);
 
   const handleCategoryClick = (category: Category) => {
     console.log('[CategoryPage] Category clicked:', category.key);
@@ -57,7 +57,7 @@ const CategoryPage: React.FC = () => {
       <ScrollView scrollY>
         <View className={styles.categoryGrid}>
           {categories.map((cat, idx) => {
-            const count = getPostsByCategory(cat.key).length;
+            const count = filterPostsByBlacklist(getPostsByCategory(cat.key)).length;
             return (
               <View
                 key={cat.id}

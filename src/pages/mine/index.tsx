@@ -31,7 +31,11 @@ const MinePage: React.FC = () => {
     deletePost,
     removeDraft,
     removeFromBlacklist,
-    addPost
+    addPost,
+    getLikedPosts,
+    getCollectedPosts,
+    togglePostLike,
+    togglePostCollect
   } = useApp();
 
   const [showNicknameModal, setShowNicknameModal] = useState(false);
@@ -39,6 +43,8 @@ const MinePage: React.FC = () => {
   const [showPostsModal, setShowPostsModal] = useState(false);
   const [showDraftsModal, setShowDraftsModal] = useState(false);
   const [showBlacklistModal, setShowBlacklistModal] = useState(false);
+  const [showLikesModal, setShowLikesModal] = useState(false);
+  const [showCollectsModal, setShowCollectsModal] = useState(false);
 
   const [newNickname, setNewNickname] = useState(user.nickname);
   const [selectedBuilding, setSelectedBuilding] = useState(user.building);
@@ -58,6 +64,8 @@ const MinePage: React.FC = () => {
 
   const authInfo = authStatusMap[user.authStatus];
   const myPosts = useMemo(() => getMyPosts(), [getMyPosts]);
+  const likedPosts = useMemo(() => getLikedPosts(), [getLikedPosts]);
+  const collectedPosts = useMemo(() => getCollectedPosts(), [getCollectedPosts]);
 
   const handleEditProfile = useCallback(() => {
     setNewNickname(user.nickname);
@@ -104,6 +112,34 @@ const MinePage: React.FC = () => {
   const handleViewMyPosts = useCallback(() => {
     setShowPostsModal(true);
   }, []);
+
+  const handleViewLiked = useCallback(() => {
+    setShowLikesModal(true);
+  }, []);
+
+  const handleViewCollected = useCallback(() => {
+    setShowCollectsModal(true);
+  }, []);
+
+  const handleViewPostDetailFromLikes = useCallback((postId: string) => {
+    setShowLikesModal(false);
+    Taro.navigateTo({ url: `/pages/detail/index?id=${postId}` });
+  }, []);
+
+  const handleViewPostDetailFromCollects = useCallback((postId: string) => {
+    setShowCollectsModal(false);
+    Taro.navigateTo({ url: `/pages/detail/index?id=${postId}` });
+  }, []);
+
+  const handleUnlike = useCallback((postId: string) => {
+    togglePostLike(postId);
+    Taro.showToast({ title: '已取消点赞', icon: 'none' });
+  }, [togglePostLike]);
+
+  const handleUncollect = useCallback((postId: string) => {
+    togglePostCollect(postId);
+    Taro.showToast({ title: '已取消收藏', icon: 'none' });
+  }, [togglePostCollect]);
 
   const handleViewPostDetail = useCallback((postId: string) => {
     setShowPostsModal(false);
@@ -152,6 +188,7 @@ const MinePage: React.FC = () => {
       success: (res) => {
         if (res.confirm) {
           const categoryName = categoryNameMap[draft.category] || '其他闲聊';
+          const showLoc = typeof draft.showLocation === 'boolean' ? draft.showLocation : true;
           addPost({
             id: `post_${Date.now()}`,
             title: draft.title || '(无标题)',
@@ -163,8 +200,8 @@ const MinePage: React.FC = () => {
             authorId: user.id,
             authorName: draft.isAnonymous ? '匿名邻居' : user.nickname,
             authorAvatar: user.avatar,
-            authorBuilding: user.building,
-            building: user.building,
+            authorBuilding: showLoc ? user.building : '保密',
+            building: showLoc ? user.building : '未知',
             createdAt: new Date().toISOString(),
             likeCount: 0,
             commentCount: 0,
@@ -221,15 +258,15 @@ const MinePage: React.FC = () => {
       icon: '⭐',
       iconBg: styles.iconBg2,
       title: '我的收藏',
-      desc: `${user.collectCount} 条收藏`,
-      action: () => Taro.showToast({ title: '查看收藏', icon: 'none' })
+      desc: `${collectedPosts.length} 条收藏`,
+      action: handleViewCollected
     },
     {
       icon: '❤️',
       iconBg: styles.iconBg3,
       title: '我的点赞',
-      desc: `点赞过 ${user.likeCount} 条`,
-      action: () => Taro.showToast({ title: '查看点赞', icon: 'none' })
+      desc: `点赞过 ${likedPosts.length} 条`,
+      action: handleViewLiked
     },
     {
       icon: '📋',
@@ -575,6 +612,132 @@ const MinePage: React.FC = () => {
     </>
   );
 
+  const renderLikesModal = () => (
+    <>
+      <View className={styles.maskLayer} onClick={() => setShowLikesModal(false)} />
+      <View className={classnames(styles.modal, showLikesModal && styles.modalVisible)}>
+        <View className={styles.modalHeader}>
+          <Text className={styles.modalTitle}>我的点赞（{likedPosts.length}）</Text>
+          <Text className={styles.modalClose} onClick={() => setShowLikesModal(false)}>✕</Text>
+        </View>
+        <ScrollView scrollY className={styles.modalBody}>
+          {likedPosts.length > 0 ? (
+            likedPosts.map((post) => (
+              <View className={styles.listItem} key={post.id}>
+                {post.images && post.images.length > 0 ? (
+                  <Image
+                    className={styles.listItemAvatar}
+                    src={post.images[0]}
+                    mode="aspectFill"
+                  />
+                ) : (
+                  <View className={styles.listItemAvatar} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '36rpx' }}>
+                    ❤️
+                  </View>
+                )}
+                <View className={styles.listItemContent}>
+                  <Text className={styles.listItemTitle}>{post.title || '(无标题)'}</Text>
+                  <View className={styles.postMeta}>
+                    <Text className={styles.postMetaItem}>{categoryNameMap[post.category] || '其他'}</Text>
+                    <Text className={styles.postMetaItem}>💬 {post.commentCount}</Text>
+                    <Text className={styles.postMetaItem}>{formatDateTime(post.createdAt).split(' ')[0]}</Text>
+                  </View>
+                </View>
+                <View className={styles.listItemActions}>
+                  <Button
+                    className={classnames(styles.actionBtn, styles.actionBtnPrimary)}
+                    onClick={() => handleViewPostDetailFromLikes(post.id)}
+                  >
+                    查看
+                  </Button>
+                  <Button
+                    className={classnames(styles.actionBtn, styles.actionBtnDanger)}
+                    onClick={() => handleUnlike(post.id)}
+                  >
+                    取消
+                  </Button>
+                </View>
+              </View>
+            ))
+          ) : (
+            <Text className={styles.emptyTip}>还没有点赞过帖子，去首页逛逛吧~</Text>
+          )}
+        </ScrollView>
+        <View className={styles.modalFooter}>
+          <Button
+            className={classnames(styles.modalBtn, styles.modalBtnSecondary)}
+            onClick={() => setShowLikesModal(false)}
+          >
+            关闭
+          </Button>
+        </View>
+      </View>
+    </>
+  );
+
+  const renderCollectsModal = () => (
+    <>
+      <View className={styles.maskLayer} onClick={() => setShowCollectsModal(false)} />
+      <View className={classnames(styles.modal, showCollectsModal && styles.modalVisible)}>
+        <View className={styles.modalHeader}>
+          <Text className={styles.modalTitle}>我的收藏（{collectedPosts.length}）</Text>
+          <Text className={styles.modalClose} onClick={() => setShowCollectsModal(false)}>✕</Text>
+        </View>
+        <ScrollView scrollY className={styles.modalBody}>
+          {collectedPosts.length > 0 ? (
+            collectedPosts.map((post) => (
+              <View className={styles.listItem} key={post.id}>
+                {post.images && post.images.length > 0 ? (
+                  <Image
+                    className={styles.listItemAvatar}
+                    src={post.images[0]}
+                    mode="aspectFill"
+                  />
+                ) : (
+                  <View className={styles.listItemAvatar} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '36rpx' }}>
+                    ⭐
+                  </View>
+                )}
+                <View className={styles.listItemContent}>
+                  <Text className={styles.listItemTitle}>{post.title || '(无标题)'}</Text>
+                  <View className={styles.postMeta}>
+                    <Text className={styles.postMetaItem}>{categoryNameMap[post.category] || '其他'}</Text>
+                    <Text className={styles.postMetaItem}>💬 {post.commentCount}</Text>
+                    <Text className={styles.postMetaItem}>{formatDateTime(post.createdAt).split(' ')[0]}</Text>
+                  </View>
+                </View>
+                <View className={styles.listItemActions}>
+                  <Button
+                    className={classnames(styles.actionBtn, styles.actionBtnPrimary)}
+                    onClick={() => handleViewPostDetailFromCollects(post.id)}
+                  >
+                    查看
+                  </Button>
+                  <Button
+                    className={classnames(styles.actionBtn, styles.actionBtnDanger)}
+                    onClick={() => handleUncollect(post.id)}
+                  >
+                    取消
+                  </Button>
+                </View>
+              </View>
+            ))
+          ) : (
+            <Text className={styles.emptyTip}>还没有收藏帖子，看到喜欢的可以收藏哦~</Text>
+          )}
+        </ScrollView>
+        <View className={styles.modalFooter}>
+          <Button
+            className={classnames(styles.modalBtn, styles.modalBtnSecondary)}
+            onClick={() => setShowCollectsModal(false)}
+          >
+            关闭
+          </Button>
+        </View>
+      </View>
+    </>
+  );
+
   return (
     <View className={styles.minePage}>
       <View className={styles.userHeader}>
@@ -634,6 +797,8 @@ const MinePage: React.FC = () => {
       {showPostsModal && renderPostsModal()}
       {showDraftsModal && renderDraftsModal()}
       {showBlacklistModal && renderBlacklistModal()}
+      {showLikesModal && renderLikesModal()}
+      {showCollectsModal && renderCollectsModal()}
     </View>
   );
 };

@@ -21,11 +21,13 @@ const DetailPage: React.FC = () => {
     togglePostCollect,
     toggleCommentLike,
     toggleCommentTop,
-    addComment
+    addComment,
+    filterCommentsByBlacklist,
+    addMessage
   } = useApp();
 
   const [postData, setPostData] = useState(() => getPostById(postId));
-  const [commentsData, setCommentsData] = useState(() => getCommentsByPostId(postId));
+  const [commentsData, setCommentsData] = useState(() => filterCommentsByBlacklist(getCommentsByPostId(postId)));
   const [isFollowed, setIsFollowed] = useState(false);
   const [showInputModal, setShowInputModal] = useState(false);
   const [commentText, setCommentText] = useState('');
@@ -33,12 +35,12 @@ const DetailPage: React.FC = () => {
 
   useEffect(() => {
     setPostData(getPostById(postId));
-    setCommentsData(getCommentsByPostId(postId));
-  }, [postId, getPostById, getCommentsByPostId]);
+    setCommentsData(filterCommentsByBlacklist(getCommentsByPostId(postId)));
+  }, [postId, getPostById, getCommentsByPostId, filterCommentsByBlacklist]);
 
   useDidShow(() => {
     setPostData(getPostById(postId));
-    setCommentsData(getCommentsByPostId(postId));
+    setCommentsData(filterCommentsByBlacklist(getCommentsByPostId(postId)));
   });
 
   const categoryColor = useMemo(() => {
@@ -151,7 +153,32 @@ const DetailPage: React.FC = () => {
     };
 
     addComment(newComment);
-    setCommentsData(getCommentsByPostId(postId));
+
+    if (!isOwner) {
+      addMessage({
+        type: 'reply',
+        title: '新回复提醒',
+        content: `${user.nickname} 回复了你的帖子「${postData.title.substring(0, 15)}${postData.title.length > 15 ? '...' : ''}」：${commentText.trim().substring(0, 30)}`,
+        postId: postId as string,
+        postTitle: postData.title,
+        fromUserName: user.nickname,
+        fromUserAvatar: user.avatar
+      });
+    }
+
+    if (replyToComment && replyToComment.authorId !== user.id && replyToComment.authorId !== postData.authorId) {
+      addMessage({
+        type: 'reply',
+        title: '新回复提醒',
+        content: `${user.nickname} 回复了你的评论：${commentText.trim().substring(0, 30)}`,
+        postId: postId as string,
+        postTitle: postData.title,
+        fromUserName: user.nickname,
+        fromUserAvatar: user.avatar
+      });
+    }
+
+    setCommentsData(filterCommentsByBlacklist(getCommentsByPostId(postId)));
     setPostData(getPostById(postId));
     Taro.showToast({ title: '评论成功', icon: 'success' });
     handleCloseInput();
@@ -159,14 +186,18 @@ const DetailPage: React.FC = () => {
 
   const handleLikeComment = (commentId: string) => {
     toggleCommentLike(commentId);
-    setCommentsData(getCommentsByPostId(postId));
+    setCommentsData(filterCommentsByBlacklist(getCommentsByPostId(postId)));
   };
 
   const handleTopComment = (commentId: string) => {
     if (!postData) return;
+    const target = commentsData.find(c => c.id === commentId);
     toggleCommentTop(postData.id, commentId);
-    setCommentsData(getCommentsByPostId(postId));
-    Taro.showToast({ title: '操作成功', icon: 'success' });
+    setCommentsData(filterCommentsByBlacklist(getCommentsByPostId(postId)));
+    Taro.showToast({
+      title: target?.isTop ? '已取消置顶' : '置顶成功',
+      icon: 'success'
+    });
   };
 
   const handleBlockAuthor = () => {
